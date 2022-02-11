@@ -2,16 +2,15 @@
 import {} from 'dotenv/config';
 import request from 'request-promise';
 import ObjectsToCsv  from 'objects-to-csv';
-import minimist from 'minimist';
 
-const cities = minimist(process.argv.slice(2));
-const apiKey = process.env.API_KEY
+const args = process.argv.slice(2)
+const apiKey = process.env.API_KEY;  
 
 const saveWeatherForCitiesCsvFile = async () => {
     try {
         const results = await getWeatherForCities(); 
-        const aa = saveToCsvFile(results);
-        saveToCsvFile(aa);
+        const cities = getListOfCities(results);
+        saveToCsvFile(cities);
       } catch(e) {
         console.log(e.message);
      }
@@ -25,7 +24,7 @@ const getWeatherForCities = () => {
      }
 }
 
-const arrayPromise = () =>  argv.splice(2).map(arg => getFetch(arg));
+const arrayPromise = () =>  args.map(arg => getFetch(arg));
 
 
 const getFetch = (city) => { 
@@ -39,10 +38,9 @@ const getFetch = (city) => {
     });
 } 
 
-const ss = (results) => {
+const getListOfCities = (results) => {
     const resultsGroupedByDateAndCity = getGroupedByDateAndCity(results);
-    const csvLines = []
-    console.log(resultsGroupedByDateAndCity);
+    const listOfCities = []
 
     for (let [date, obj] of Object.entries(resultsGroupedByDateAndCity)) {
         let dailySummary = Object.entries(obj).map(([city, dayList]) => {  
@@ -56,14 +54,14 @@ const ss = (results) => {
         let resultWithLowestTemperature = [...dailySummary].sort((resA, resB) => resA.minTemperature - resB.minTemperature)[0];
         let citiesWithRain = dailySummary.filter(res => res.totalRainfall).map(res => res.city);
       
-        getDailySummary.push({
+        listOfCities.push({
             'Day':date, 
             'City with highest temperature': resultWithHighestTemperature.city, 
             'City with Lowest temperature': resultWithLowestTemperature.city,
             'Cities with rain': citiesWithRain.toString()
         });
     }
-    return csvLines
+    return listOfCities
 }
 
 const getGroupedByDateAndCity = (results) => {
@@ -102,9 +100,9 @@ const saveToCsvFile = async (list) => {
     const csv = new ObjectsToCsv(list)
     try {
        await csv.toDisk('./list.csv')
-       console.log("Csv:", csv.toString())
+       console.log("Save file")
     } catch(e) {
-        throw new error('');
+        throw new error('Failed to save file');
     }
 }
 
