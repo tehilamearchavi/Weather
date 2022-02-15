@@ -45,8 +45,8 @@ const getListOfCities = (results) => {
     for (let [date, obj] of Object.entries(resultsGroupedByDateAndCity)) {
         let dailySummary = Object.entries(obj).map(([city, dayList]) => {  
             return { city,
-            maxTemperature: getMaxTemperatureCelsius(dayList),
-            minTemperature: getMinTemperatureCelsius(dayList),
+            maxTemperature: getMaxTemperature(dayList),
+            minTemperature: getMinTemperature(dayList),
             totalRainfall: getTotalRainFall(dayList)
         }});
 
@@ -81,12 +81,12 @@ const getGroupedByDateAndCity = (results) => {
 }
 
 
-const getMaxTemperatureCelsius = (responseList) => {
+const getMaxTemperature = (responseList) => {
     const maxTemps = responseList.map(entry => Number(entry.main.temp_max));
     return Math.max(...maxTemps);
 }
 
-const getMinTemperatureCelsius = (responseList) => {
+const getMinTemperature = (responseList) => {
     const minTemps = responseList.map(entry => Number(entry.main.temp_min));
     return Math.min(...minTemps);
 }
